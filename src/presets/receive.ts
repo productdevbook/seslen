@@ -8,6 +8,7 @@ export const receive: PresetEntry = {
   description: "Soft falling chime for incoming messages and received items.",
   tags: ["notification", "chirp"],
   recipe: "sine 1320→880 Hz · 220 ms",
+  durationMs: 240,
   motion: "pulse",
   accent: "teal",
   factory(ctx, master, opts) {

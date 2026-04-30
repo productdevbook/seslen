@@ -96,12 +96,17 @@ export function startBuffer(
       } catch {
         // already stopped
       }
+      // `source.onended` will fire once the tail finishes — fireEnded()
+      // is called from there, so don't fire here too.
     } else {
       try {
         source.stop()
       } catch {
         // already stopped
       }
+      // `source.onended` may not fire synchronously after stop(); fire
+      // ourselves so callers see ended immediately. The handler below
+      // is idempotent (endedCb is nulled after the first call).
       fireEnded()
     }
   }

@@ -8,6 +8,7 @@ export const unlock: PresetEntry = {
   description: "Two light clicks rising in pitch for unlock and grant-access actions.",
   tags: ["ui", "feedback", "click"],
   recipe: "triangle 220 + 440 Hz · 140 ms",
+  durationMs: 140,
   motion: "bounce",
   accent: "teal",
   factory(ctx, master, opts) {

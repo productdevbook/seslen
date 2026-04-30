@@ -8,6 +8,7 @@ export const expand: PresetEntry = {
   description: "Smooth rising arc for accordions, drawers and panels opening up.",
   tags: ["ui", "transition"],
   recipe: "sine 330→990 Hz · 200 ms",
+  durationMs: 220,
   motion: "pulse",
   accent: "teal",
   factory(ctx, master, opts) {

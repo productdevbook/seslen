@@ -8,6 +8,7 @@ export const paste: PresetEntry = {
   description: "Soft sustained tap for paste / drop-in confirmations.",
   tags: ["ui", "feedback"],
   recipe: "sine 880 Hz · 80 ms",
+  durationMs: 100,
   motion: "pulse",
   accent: "yellow",
   factory(ctx, master, opts) {

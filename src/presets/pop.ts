@@ -8,6 +8,7 @@ export const pop: PresetEntry = {
   description: "Bubbly downward pop for popovers, dismissals and lightweight toggles.",
   tags: ["ui", "feedback"],
   recipe: "triangle 1200→320 Hz · 90 ms",
+  durationMs: 100,
   motion: "bounce",
   accent: "pink",
   defaults: { rateJitter: 0.04, gainJitter: 0.08 },

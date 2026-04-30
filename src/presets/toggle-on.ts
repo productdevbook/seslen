@@ -8,6 +8,7 @@ export const toggleOn: PresetEntry = {
   description: "A two-step ascending click for switches and checkboxes turning on.",
   tags: ["ui", "feedback", "toggle"],
   recipe: "sine 700 + 1100 Hz · 110 ms",
+  durationMs: 130,
   motion: "bounce",
   accent: "green",
   factory(ctx, master, opts) {

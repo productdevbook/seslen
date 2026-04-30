@@ -106,11 +106,21 @@ function ComposePage(): React.ReactElement {
     [lanes],
   )
   const steps = useMemo(() => builder().steps(), [stepsSig, builder])
-  const total = useMemo(() => builder().total(), [stepsSig, builder])
+  const total = useMemo(() => {
+    let max = 0
+    for (const s of steps) {
+      const at = s.at ?? 0
+      const dur = presetEntries[s.id]?.durationMs ?? 0
+      const end = at + dur
+      if (end > max) max = end
+    }
+    return max
+  }, [steps])
   const selectedView = useMemo(() => builder().selectedBlock(), [stepsSig, selected, builder])
 
   const seslenPlay = useSeslen((s) => s.play)
   const seslenPlayPattern = useSeslen((s) => s.playPattern)
+  const seslenStopAll = useSeslen((s) => s.stopAll)
 
   const initialPresetId = (Object.keys(presetEntries)[0] ?? "tick") as string
   const [activePresetId, setActivePresetId] = useState<string>(initialPresetId)
@@ -171,10 +181,14 @@ function ComposePage(): React.ReactElement {
 
   function endPlayback(): void {
     playTokenRef.current++
+    // Stop the pattern handle and every fire-and-forget sound so a
+    // mid-playback stop kills lingering sidebar previews / drop blips
+    // that aren't tracked by liveHandleRef.
     if (liveHandleRef.current) {
       liveHandleRef.current.stop()
       liveHandleRef.current = null
     }
+    seslenStopAll()
     if (elapsedRafRef.current) {
       cancelAnimationFrame(elapsedRafRef.current)
       elapsedRafRef.current = 0
@@ -192,7 +206,15 @@ function ComposePage(): React.ReactElement {
     }
     const liveSteps = builder().steps()
     if (liveSteps.length === 0) return
-    const span = builder().total()
+    // Audible span: latest step.at + that preset's durationMs. `builder.total()`
+    // is block-edge — a UI-only construct — but the underlying preset only
+    // sounds for `presetEntry.durationMs`, so use that to keep playhead and
+    // counter in sync with what the user hears.
+    let span = 0
+    for (const s of liveSteps) {
+      const end = (s.at ?? 0) + (presetEntries[s.id]?.durationMs ?? 0)
+      if (end > span) span = end
+    }
     if (span <= 0) return
 
     const token = ++playTokenRef.current

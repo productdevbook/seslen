@@ -8,6 +8,7 @@ export const coin: PresetEntry = {
   description: "Two-note metallic ping for coin pickups, points and item collections.",
   tags: ["game", "pickup"],
   recipe: "square 988 + 1320 Hz · 180 ms",
+  durationMs: 200,
   motion: "flash",
   accent: "yellow",
   factory(ctx, master, opts) {

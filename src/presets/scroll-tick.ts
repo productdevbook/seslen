@@ -8,6 +8,7 @@ export const scrollTick: PresetEntry = {
   description: "Tiny detent click for scroll wheels, sliders, steppers and value pickers.",
   tags: ["ui", "click"],
   recipe: "triangle 3 kHz · 6 ms",
+  durationMs: 8,
   motion: "bounce",
   accent: "teal",
   defaults: { rateJitter: 0.06, detuneJitter: 40, minInterval: 20, voices: 4, steal: "oldest" },

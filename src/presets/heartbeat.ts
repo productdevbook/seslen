@@ -8,6 +8,7 @@ export const heartbeat: PresetEntry = {
   description: "Two low thumps spaced like a human heartbeat — for tension and pulse states.",
   tags: ["ambient", "rhythm"],
   recipe: "sine 60 Hz double-thump · 600 ms",
+  durationMs: 360,
   motion: "pulse",
   accent: "red",
   factory(ctx, master, opts) {

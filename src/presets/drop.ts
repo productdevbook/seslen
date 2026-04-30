@@ -8,6 +8,7 @@ export const drop: PresetEntry = {
   description: "Short low thud for the end of a drag gesture or item drop.",
   tags: ["ui", "drag"],
   recipe: "sine 220→110 Hz · 120 ms",
+  durationMs: 150,
   motion: "shake",
   accent: "orange",
   factory(ctx, master, opts) {

@@ -8,6 +8,7 @@ export const send: PresetEntry = {
   description: "Rising whoosh for send, submit and publish actions.",
   tags: ["ui", "noise", "sweep"],
   recipe: "noise sweep 600→4000 Hz · 220 ms",
+  durationMs: 240,
   motion: "swirl",
   accent: "blue",
   factory(ctx, master, opts) {

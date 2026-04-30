@@ -8,6 +8,7 @@ export const typewriter: PresetEntry = {
   description: "Tiny dry tick for streaming text and typewriter character reveals.",
   tags: ["ui", "click"],
   recipe: "triangle 2.6 kHz · 8 ms",
+  durationMs: 10,
   motion: "bounce",
   accent: "purple",
   defaults: {

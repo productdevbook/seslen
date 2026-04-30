@@ -8,6 +8,7 @@ export const collapse: PresetEntry = {
   description: "Falling arc for accordions, drawers and panels collapsing.",
   tags: ["ui", "transition"],
   recipe: "sine 990→330 Hz · 200 ms",
+  durationMs: 220,
   motion: "pulse",
   accent: "teal",
   factory(ctx, master, opts) {

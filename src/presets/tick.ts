@@ -11,6 +11,7 @@ export const tick: PresetEntry = {
   description: "A short, crisp click for buttons, toggles and toasts.",
   tags: ["ui", "feedback", "click"],
   recipe: "sine 4 kHz · 3 ms",
+  durationMs: 5,
   motion: "bounce",
   accent: "blue",
   defaults: { rateJitter: 0.04, gainJitter: 0.08, minInterval: 25 },

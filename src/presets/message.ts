@@ -8,6 +8,7 @@ export const message: PresetEntry = {
   description: "Soft two-tone bell for incoming messages and notifications.",
   tags: ["notification", "bell"],
   recipe: "sine 880 + 1320 Hz · 420 ms",
+  durationMs: 420,
   motion: "pulse",
   accent: "indigo",
   factory(ctx, master, opts) {

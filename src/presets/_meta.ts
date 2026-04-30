@@ -60,6 +60,11 @@ export interface PresetEntry {
    *  `createSeslen({ sources, defaults })`. Pure data — consumers can
    *  override on a per-call basis with `play(name, opts)`. */
   readonly defaults?: SourceDefaults
+  /** Approximate audible duration in milliseconds. Synthesised factories
+   *  don't expose `duration` on their `PlayHandle`, so this is the
+   *  metadata-side hint UIs need to show progress, sequence presets and
+   *  size waveform previews. Should match the recipe's tail. */
+  readonly durationMs?: number
   /** The synthesis function. */
   readonly factory: SoundFactory
 }

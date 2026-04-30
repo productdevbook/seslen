@@ -8,6 +8,7 @@ export const undo: PresetEntry = {
   description: "Two-note reverse blip for undo, back and step-back actions.",
   tags: ["ui", "feedback"],
   recipe: "triangle 880→520 Hz · 180 ms",
+  durationMs: 200,
   motion: "shake",
   accent: "indigo",
   factory(ctx, master, opts) {

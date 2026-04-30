@@ -8,6 +8,7 @@ export const warning: PresetEntry = {
   description: "Two-tone alarm for cautions and confirmations that need attention.",
   tags: ["feedback", "warning"],
   recipe: "square 880↔660 Hz · 500 ms",
+  durationMs: 520,
   motion: "wiggle",
   accent: "orange",
   factory(ctx, master, opts) {

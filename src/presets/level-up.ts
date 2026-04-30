@@ -8,6 +8,7 @@ export const levelUp: PresetEntry = {
   description: "Bright ascending five-note scale for level-ups, milestones and rewards.",
   tags: ["game", "success", "arpeggio"],
   recipe: "C-D-E-G-C arpeggio · 480 ms",
+  durationMs: 700,
   motion: "flash",
   accent: "yellow",
   factory(ctx, master, opts) {

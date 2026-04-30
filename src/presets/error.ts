@@ -8,6 +8,7 @@ export const error: PresetEntry = {
   description: "A short descending buzz for failed or rejected actions.",
   tags: ["feedback", "error"],
   recipe: "square 220→150 Hz · 260 ms",
+  durationMs: 280,
   motion: "shake",
   accent: "red",
   factory(ctx, master, opts) {

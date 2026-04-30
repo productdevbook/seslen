@@ -8,6 +8,7 @@ export const notify: PresetEntry = {
   description: "Three-tone ascending notification for in-app alerts and banners.",
   tags: ["notification", "chirp"],
   recipe: "sine 660-880-1320 Hz · 360 ms",
+  durationMs: 380,
   motion: "pulse",
   accent: "blue",
   factory(ctx, master, opts) {

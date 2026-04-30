@@ -8,6 +8,7 @@ export const alarm: PresetEntry = {
   description: "Repeating two-tone siren for sustained alarms and timed warnings.",
   tags: ["feedback", "warning"],
   recipe: "square 880↔660 Hz · 4 cycles · 800 ms",
+  durationMs: 840,
   motion: "shake",
   accent: "red",
   factory(ctx, master, opts) {

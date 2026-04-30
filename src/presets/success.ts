@@ -8,6 +8,7 @@ export const success: PresetEntry = {
   description: "Two-step rising chirp for completed actions and confirmations.",
   tags: ["feedback", "success", "chirp"],
   recipe: "triangle 660→990→1320 Hz · 320 ms",
+  durationMs: 340,
   motion: "bounce",
   accent: "green",
   factory(ctx, master, opts) {

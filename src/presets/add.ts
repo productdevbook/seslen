@@ -8,6 +8,7 @@ export const add: PresetEntry = {
   description: "A quick rising blip for adding items, ticking todos and incrementing counters.",
   tags: ["ui", "feedback", "chirp"],
   recipe: "sine 880→1480 Hz · 140 ms",
+  durationMs: 160,
   motion: "bounce",
   accent: "teal",
   factory(ctx, master, opts) {

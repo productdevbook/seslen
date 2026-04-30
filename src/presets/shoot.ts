@@ -8,6 +8,7 @@ export const shoot: PresetEntry = {
   description: "Bandpassed noise zap for shoots, lasers and quick projectiles.",
   tags: ["game", "noise"],
   recipe: "noise sweep 5 kHz→500 Hz · 130 ms",
+  durationMs: 140,
   motion: "shake",
   accent: "red",
   factory(ctx, master, opts) {

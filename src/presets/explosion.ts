@@ -8,6 +8,7 @@ export const explosion: PresetEntry = {
   description: "Low rumbling noise burst for explosions, crashes and impact moments.",
   tags: ["game", "noise"],
   recipe: "noise lowpass 2 kHz→100 Hz · 600 ms",
+  durationMs: 620,
   motion: "shake",
   accent: "red",
   factory(ctx, master, opts) {

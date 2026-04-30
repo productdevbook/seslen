@@ -8,6 +8,7 @@ export const drag: PresetEntry = {
   description: "Soft pickup chirp for the start of a drag gesture.",
   tags: ["ui", "drag"],
   recipe: "sine 440→660 Hz · 120 ms",
+  durationMs: 140,
   motion: "pulse",
   accent: "orange",
   factory(ctx, master, opts) {

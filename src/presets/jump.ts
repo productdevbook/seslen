@@ -8,6 +8,7 @@ export const jump: PresetEntry = {
   description: "Quick rising blip for jumps and pop-up animations.",
   tags: ["game"],
   recipe: "square 220→880 Hz · 100 ms",
+  durationMs: 120,
   motion: "bounce",
   accent: "green",
   factory(ctx, master, opts) {

@@ -8,6 +8,7 @@ export const redo: PresetEntry = {
   description: "Two-note forward blip for redo and replay actions.",
   tags: ["ui", "feedback"],
   recipe: "triangle 520→880 Hz · 180 ms",
+  durationMs: 200,
   motion: "bounce",
   accent: "indigo",
   factory(ctx, master, opts) {

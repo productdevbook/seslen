@@ -8,6 +8,7 @@ export const copy: PresetEntry = {
   description: "Bright two-tap blip for copy-to-clipboard confirmations.",
   tags: ["ui", "feedback"],
   recipe: "sine 1480 + 1480 Hz · 90 ms",
+  durationMs: 100,
   motion: "bounce",
   accent: "yellow",
   factory(ctx, master, opts) {

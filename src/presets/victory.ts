@@ -8,6 +8,7 @@ export const victory: PresetEntry = {
   description: "A four-note major arpeggio for level-ups and game-style success.",
   tags: ["game", "success", "arpeggio"],
   recipe: "C-E-G-C arpeggio · 360 ms",
+  durationMs: 600,
   motion: "flash",
   accent: "yellow",
   factory(ctx, master, opts) {

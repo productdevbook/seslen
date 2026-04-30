@@ -8,6 +8,7 @@ export const deletePreset: PresetEntry = {
   description: "Filtered noise swoosh for removing items and dismissing dialogs.",
   tags: ["ui", "noise", "sweep"],
   recipe: "noise sweep 4 kHz→400 Hz · 200 ms",
+  durationMs: 220,
   motion: "swirl",
   accent: "purple",
   factory(ctx, master, opts) {

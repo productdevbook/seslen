@@ -8,6 +8,7 @@ export const swoosh: PresetEntry = {
   description: "Filtered noise sweep for transitions, modal opens and panel reveals.",
   tags: ["ui", "noise", "sweep"],
   recipe: "noise sweep 400→4000 Hz · 240 ms",
+  durationMs: 260,
   motion: "swirl",
   accent: "indigo",
   factory(ctx, master, opts) {

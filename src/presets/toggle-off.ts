@@ -8,6 +8,7 @@ export const toggleOff: PresetEntry = {
   description: "A two-step descending click for switches and checkboxes turning off.",
   tags: ["ui", "feedback", "toggle"],
   recipe: "sine 1100 + 700 Hz · 110 ms",
+  durationMs: 130,
   motion: "bounce",
   accent: "red",
   factory(ctx, master, opts) {

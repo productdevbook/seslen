@@ -8,6 +8,7 @@ export const hover: PresetEntry = {
   description: "A near-silent sine puff for hover affordance — safe to fire repeatedly.",
   tags: ["ui", "hover"],
   recipe: "sine 2.4 kHz · 25 ms",
+  durationMs: 30,
   motion: "pulse",
   accent: "blue",
   defaults: { rateJitter: 0.05, gainJitter: 0.1, minInterval: 40, voices: 3, steal: "oldest" },

@@ -8,6 +8,7 @@ export const keypress: PresetEntry = {
   description: "A short mechanical-key click — defaults to heavy jitter so typing feels organic.",
   tags: ["ui", "click", "keyboard"],
   recipe: "square 1.8 kHz · 12 ms",
+  durationMs: 14,
   motion: "bounce",
   accent: "purple",
   defaults: { rateJitter: 0.12, detuneJitter: 80, gainJitter: 0.2, minInterval: 30 },

@@ -8,6 +8,7 @@ export const lock: PresetEntry = {
   description: "Two heavy clicks for locking, sealing and confirming a secured state.",
   tags: ["ui", "feedback", "click"],
   recipe: "square 320 + 220 Hz · 140 ms",
+  durationMs: 140,
   motion: "shake",
   accent: "indigo",
   factory(ctx, master, opts) {
