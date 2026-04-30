@@ -131,7 +131,6 @@ function ComposePage(): React.ReactElement {
     endMs: 10_000,
   })
   const [playing, setPlaying] = useState(false)
-  const [elapsedMs, setElapsedMs] = useState(0)
   const [demosOpen, setDemosOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [drag, setDrag] = useState<DragState | null>(null)
@@ -141,6 +140,11 @@ function ComposePage(): React.ReactElement {
   const liveHandleRef = useRef<PlayHandle | null>(null)
   const elapsedRafRef = useRef<number>(0)
   const playTokenRef = useRef(0)
+  // The elapsed time counter is mutated directly on the DOM via this ref
+  // every RAF, instead of a setElapsedMs() that would re-render the
+  // entire ComposePage tree (canvas waveform + timeline + sidebar) at
+  // 60fps and make the playhead stutter.
+  const elapsedLabelRef = useRef<HTMLSpanElement | null>(null)
 
   /* hydrate from URL once */
   const restoredRef = useRef(false)
@@ -196,7 +200,7 @@ function ComposePage(): React.ReactElement {
     timelineRef.current?.stopPlayhead()
     previewRef.current?.stopPlayhead()
     setPlaying(false)
-    setElapsedMs(0)
+    if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(0)
   }
 
   function play(): void {
@@ -221,7 +225,7 @@ function ComposePage(): React.ReactElement {
     timelineRef.current?.runPlayhead(span)
     previewRef.current?.runPlayhead(span)
     setPlaying(true)
-    setElapsedMs(0)
+    if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(0)
 
     const startedAt = performance.now()
     function tickElapsed(): void {
@@ -231,7 +235,8 @@ function ComposePage(): React.ReactElement {
         endPlayback()
         return
       }
-      setElapsedMs(t)
+      // Direct DOM write — no React re-render at 60fps.
+      if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(t)
       elapsedRafRef.current = requestAnimationFrame(tickElapsed)
     }
     elapsedRafRef.current = requestAnimationFrame(tickElapsed)
@@ -716,7 +721,9 @@ function ComposePage(): React.ReactElement {
           </Tooltip>
 
           <span className="font-mono text-[12px] tabular-nums text-muted-foreground min-w-[110px]">
-            <span className={playing ? "text-foreground" : ""}>{formatTime(elapsedMs)}</span>
+            <span ref={elapsedLabelRef} className={playing ? "text-foreground" : ""}>
+              {formatTime(0)}
+            </span>
             <span className="opacity-60"> / </span>
             <span>{totalLabel}</span>
           </span>

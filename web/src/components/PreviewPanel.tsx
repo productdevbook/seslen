@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react"
 import type { PatternStep } from "seslen"
 import { presetEntries } from "seslen/presets"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -34,9 +34,17 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const [playheadMs, setPlayheadMs] = useState(0)
-  const [playheadVisible, setPlayheadVisible] = useState(false)
+  const playheadRef = useRef<HTMLDivElement | null>(null)
   const playheadRafRef = useRef<number>(0)
+  // Latest view-window in refs so the RAF body doesn't depend on
+  // closure-captured state — that was the cause of the jerky playhead:
+  // every state-driven re-render of PreviewPanel re-rendered the whole
+  // tree (waveform canvas included) every frame. Now the RAF only
+  // mutates `style.left` / `style.display` directly.
+  const viewRangeRef = useRef<{ start: number; end: number }>({
+    start: 0,
+    end: Math.max(1, totalMs),
+  })
 
   const viewStart = Math.max(0, viewStartMs ?? 0)
   const viewEnd = useMemo(() => {
@@ -46,32 +54,40 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
     return v
   }, [viewEndMs, viewStart, totalMs])
 
+  // Keep the RAF view-range ref in sync with the resolved viewStart/viewEnd
+  // every render. Cheap, no re-render cost.
+  viewRangeRef.current = { start: viewStart, end: viewEnd }
+
   const totalLabel = formatTime(totalMs)
   const viewLabel = `${formatTime(viewStart)} → ${formatTime(viewEnd)}`
 
-  const playheadPct = useMemo(() => {
-    const span = Math.max(1, viewEnd - viewStart)
-    const ratio = (playheadMs - viewStart) / span
-    return Math.max(0, Math.min(1, ratio))
-  }, [playheadMs, viewStart, viewEnd])
-
-  const playheadInView = playheadVisible && playheadMs >= viewStart && playheadMs <= viewEnd
+  function paintPlayhead(elapsed: number): void {
+    const el = playheadRef.current
+    if (!el) return
+    const { start, end } = viewRangeRef.current
+    const span = Math.max(1, end - start)
+    const ratio = Math.max(0, Math.min(1, (elapsed - start) / span))
+    const inView = elapsed >= start && elapsed <= end
+    el.style.display = inView ? "block" : "none"
+    el.style.left = `${ratio * 100}%`
+  }
 
   useImperativeHandle(ref, () => ({
     runPlayhead(durationMs: number) {
       if (durationMs <= 0) return
       if (playheadRafRef.current) cancelAnimationFrame(playheadRafRef.current)
-      setPlayheadVisible(true)
       const start = performance.now()
       const tick = (): void => {
         const elapsed = performance.now() - start
         if (elapsed >= durationMs) {
           playheadRafRef.current = 0
-          setPlayheadVisible(false)
-          setPlayheadMs(0)
+          if (playheadRef.current) {
+            playheadRef.current.style.display = "none"
+            playheadRef.current.style.left = "0%"
+          }
           return
         }
-        setPlayheadMs(elapsed)
+        paintPlayhead(elapsed)
         playheadRafRef.current = requestAnimationFrame(tick)
       }
       playheadRafRef.current = requestAnimationFrame(tick)
@@ -81,8 +97,10 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
         cancelAnimationFrame(playheadRafRef.current)
         playheadRafRef.current = 0
       }
-      setPlayheadVisible(false)
-      setPlayheadMs(0)
+      if (playheadRef.current) {
+        playheadRef.current.style.display = "none"
+        playheadRef.current.style.left = "0%"
+      }
     },
   }))
 
@@ -304,11 +322,9 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
       <div className="relative flex-1 min-h-0 overflow-hidden bg-foreground/40">
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
         <div
-          className="absolute top-0 bottom-0 w-px bg-background/80"
-          style={{
-            left: `${playheadPct * 100}%`,
-            display: playheadInView ? "block" : "none",
-          }}
+          ref={playheadRef}
+          className="absolute top-0 bottom-0 w-px bg-background/80 pointer-events-none"
+          style={{ display: "none", left: "0%" }}
         />
         {!hasContent && (
           <p className="absolute inset-0 flex items-center justify-center text-[12px] opacity-60">

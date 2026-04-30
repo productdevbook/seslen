@@ -92,8 +92,15 @@ function IndexPage(): React.ReactElement {
     btn: HTMLButtonElement,
   ): Promise<void> {
     e.stopPropagation()
+    const snippet = [
+      `import { createSeslen } from "seslen"`,
+      `import { presets } from "seslen/presets"`,
+      ``,
+      `const ses = createSeslen({ sources: presets })`,
+      `await ses.play("${entry.id}")`,
+    ].join("\n")
     try {
-      await navigator.clipboard.writeText(`await ses.play("${entry.id}")`)
+      await navigator.clipboard.writeText(snippet)
       btn.dataset.copied = "true"
       const t = setTimeout(() => {
         btn.dataset.copied = "false"
