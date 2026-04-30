@@ -47,12 +47,40 @@ jobs:
         run: pnpm attw
 
       - name: 📦 Publish to npm
-        run: pnpm publish --provenance --access public --no-git-checks
+        # Skip cleanly if this version was already published (e.g. a
+        # re-run after an unrelated step failed). Anything else still
+        # fails the job.
+        run: |
+          set +e
+          out=$(pnpm publish --provenance --access public --no-git-checks 2>&1)
+          status=$?
+          echo "$out"
+          if [ $status -ne 0 ]; then
+            if echo "$out" | grep -q "previously published versions"; then
+              echo "::notice::npm version already published — skipping"
+              exit 0
+            fi
+            exit $status
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 🦕 Publish to JSR (OIDC)
-        run: npx jsr publish
+        # Same idempotency contract: re-running a release shouldn't
+        # double-publish, but a missing JSR push (which is what dragged
+        # down v0.1.0) should still recover on a re-run.
+        run: |
+          set +e
+          out=$(npx jsr publish 2>&1)
+          status=$?
+          echo "$out"
+          if [ $status -ne 0 ]; then
+            if echo "$out" | grep -q "already exists"; then
+              echo "::notice::JSR version already published — skipping"
+              exit 0
+            fi
+            exit $status
+          fi
 
       - name: 📝 Generate changelog
         run: pnpm dlx changelogithub
