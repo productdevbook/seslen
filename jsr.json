@@ -7,7 +7,7 @@
     "./server": "./src/server.ts"
   },
   "publish": {
-    "include": ["src/**/*.ts", "README.md", "LICENSE"],
-    "exclude": ["src/**/*.test.ts", "src/env.d.ts"]
+    "include": ["src/**/*.ts", "src/env.d.ts", "README.md", "LICENSE"],
+    "exclude": ["src/**/*.test.ts"]
   }
 }
