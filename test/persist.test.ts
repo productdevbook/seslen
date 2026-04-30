@@ -1,14 +1,43 @@
-// @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { createPersist } from "../src/_persist.ts"
 
-declare const window: { localStorage: Storage }
+/**
+ * Tiny in-memory localStorage shim. Avoids depending on jsdom: vitest 4
+ * + Node 22 would not always populate `window.localStorage.clear` on
+ * the global path, so installing our own keeps the test stable.
+ */
+function installStorage(): { reset: () => void; uninstall: () => void } {
+  const map = new Map<string, string>()
+  const storage = {
+    getItem: (k: string): string | null => (map.has(k) ? (map.get(k) as string) : null),
+    setItem: (k: string, v: string): void => {
+      map.set(k, String(v))
+    },
+    removeItem: (k: string): void => {
+      map.delete(k)
+    },
+    clear: (): void => {
+      map.clear()
+    },
+  }
+  const g = globalThis as { window?: { localStorage?: unknown } }
+  const prevWindow = g.window
+  g.window = { ...(prevWindow ?? {}), localStorage: storage } as { localStorage: unknown }
+  return {
+    reset: () => map.clear(),
+    uninstall: () => {
+      g.window = prevWindow
+    },
+  }
+}
+
+let store: ReturnType<typeof installStorage>
 
 beforeEach(() => {
-  window.localStorage.clear()
+  store = installStorage()
 })
 afterEach(() => {
-  window.localStorage.clear()
+  store.uninstall()
 })
 
 describe("createPersist", () => {
@@ -27,7 +56,9 @@ describe("createPersist", () => {
   })
 
   it("ignores corrupt JSON", () => {
-    window.localStorage.setItem("seslen:test", "{not json")
+    ;(
+      globalThis as { window?: { localStorage?: { setItem: (k: string, v: string) => void } } }
+    ).window!.localStorage!.setItem("seslen:test", "{not json")
     const p = createPersist("seslen:test")
     expect(p.load()).toEqual({})
   })

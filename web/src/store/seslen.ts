@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { createSeslen, type PlayHandle, type PlayOptions } from "seslen"
-import { presets } from "seslen/presets"
+import { presets, presetEntries } from "seslen/presets"
 
 export interface LogEntry {
   ts: string
@@ -13,7 +13,14 @@ type CtxState = "idle" | "running" | "suspended" | "closed"
 // Cast to a wider name set so user-provided ids work alongside built-ins.
 const ses = createSeslen<string>({ sources: presets, volume: 0.8 })
 
-const loopHandles = new Map<string, PlayHandle>()
+/** Live loops. Buffer/URL sources expose native loop via `{ loop: true }`,
+ *  but synthesised factory presets are tail-stopped one-shots — we have
+ *  to retrigger them on an interval roughly as long as their recipe. */
+interface Loop {
+  handle?: PlayHandle
+  intervalId?: ReturnType<typeof setInterval>
+}
+const loopHandles = new Map<string, Loop>()
 
 interface SeslenState {
   callOpts: PlayOptions
@@ -85,22 +92,43 @@ export const useSeslen = create<SeslenState>((set, get) => {
     startLoop: async (id) => {
       const existing = loopHandles.get(id)
       if (existing) {
-        existing.stop()
+        existing.handle?.stop()
+        if (existing.intervalId) clearInterval(existing.intervalId)
         loopHandles.delete(id)
         pushLog(get, set, `loop stop "${id}"`)
         set({ loopVersion: get().loopVersion + 1 })
         return
       }
-      const handle = await ses.play(id, { ...get().callOpts, loop: true })
-      if (!handle) return
-      loopHandles.set(id, handle)
+      const opts = { ...get().callOpts }
+      const source = presets[id as keyof typeof presets]
+      const isFactory = typeof source === "function"
+      if (isFactory) {
+        // Synth presets: retrigger on an interval. Use durationMs from
+        // metadata so the loop's tempo matches the recipe.
+        const dur = presetEntries[id]?.durationMs ?? 250
+        const period = Math.max(60, dur)
+        const fire = (): void => {
+          void ses.play(id, opts)
+        }
+        fire()
+        const intervalId = setInterval(fire, period)
+        loopHandles.set(id, { intervalId })
+      } else {
+        // Buffer/URL: native loop.
+        const handle = await ses.play(id, { ...opts, loop: true })
+        if (!handle) return
+        loopHandles.set(id, { handle })
+      }
       pushLog(get, set, `loop start "${id}"`)
       set({ loopVersion: get().loopVersion + 1 })
     },
     isLooping: (id) => loopHandles.has(id),
     stopAll: () => {
       ses.stopAll()
-      for (const [, h] of loopHandles) h.stop()
+      for (const [, l] of loopHandles) {
+        l.handle?.stop()
+        if (l.intervalId) clearInterval(l.intervalId)
+      }
       loopHandles.clear()
       pushLog(get, set, "stopAll()")
       set({ loopVersion: get().loopVersion + 1 })

@@ -212,12 +212,17 @@ function PresetRow({
   onPointerDown,
   onPreview,
 }: PresetRowProps): React.ReactElement {
+  // Two-column grid: a fixed-width action column on the right keeps the
+  // preview button perfectly aligned across rows regardless of label /
+  // subtitle width. The label/subtitle column truncates to fill the rest.
+  // Active state is signalled by a left accent stripe + bolder text — no
+  // background fills, so the sidebar stays calm and consistent.
   return (
     <div
       role="button"
       tabIndex={0}
       data-active={active ? "true" : "false"}
-      className="w-full px-3 py-2 flex items-center gap-2.5 transition data-[active=true]:bg-accent hover:bg-muted/60 cursor-pointer outline-none focus-visible:bg-muted"
+      className="group relative w-full pl-4 pr-2 py-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 cursor-pointer outline-none select-none"
       onClick={onPick}
       onPointerDown={onPointerDown}
       onKeyDown={(e) => {
@@ -227,16 +232,25 @@ function PresetRow({
         }
       }}
     >
-      <span className={`dot shrink-0 ${accentOf(entry)}`} />
-      <span className="flex flex-col items-start min-w-0 flex-1">
-        <span className="text-[12px] font-semibold truncate">{entry.label}</span>
-        <span className="text-[10px] text-muted-foreground truncate">{subtitle}</span>
+      <span
+        aria-hidden
+        className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-foreground opacity-0 group-data-[active=true]:opacity-100 transition-opacity"
+      />
+      <span className="flex items-center gap-2 min-w-0">
+        <span className={`dot shrink-0 ${accentOf(entry)}`} />
+        <span className="flex flex-col items-start min-w-0">
+          <span className="text-[12px] font-semibold truncate group-data-[active=true]:text-foreground text-foreground/85">
+            {entry.label}
+          </span>
+          <span className="text-[10px] text-muted-foreground truncate">{subtitle}</span>
+        </span>
       </span>
       <Button
         type="button"
         variant="ghost"
         size="icon-xs"
         title="Preview"
+        className="shrink-0 opacity-60 group-hover:opacity-100 transition-opacity"
         onClick={onPreview}
         onPointerDown={(e) => e.stopPropagation()}
       >
