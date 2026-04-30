@@ -2,11 +2,13 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { createPersist } from "../src/_persist.ts"
 
+declare const window: { localStorage: Storage }
+
 beforeEach(() => {
-  globalThis.localStorage.clear()
+  window.localStorage.clear()
 })
 afterEach(() => {
-  globalThis.localStorage.clear()
+  window.localStorage.clear()
 })
 
 describe("createPersist", () => {
@@ -25,7 +27,7 @@ describe("createPersist", () => {
   })
 
   it("ignores corrupt JSON", () => {
-    globalThis.localStorage.setItem("seslen:test", "{not json")
+    window.localStorage.setItem("seslen:test", "{not json")
     const p = createPersist("seslen:test")
     expect(p.load()).toEqual({})
   })

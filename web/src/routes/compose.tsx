@@ -330,6 +330,12 @@ function ComposePage(): React.ReactElement {
       overMs: null,
     }
     setDrag(initial)
+    // PresetSidebar already disables user-select on its own pointerdown,
+    // but if the drag arrives here through some other path the page text
+    // could still highlight as the cursor moves; lock it for the lifetime
+    // of the drag.
+    const prevUserSelect = document.body.style.userSelect
+    document.body.style.userSelect = "none"
 
     const move = (e: PointerEvent): void => {
       const tl = timelineRef.current
@@ -350,9 +356,13 @@ function ComposePage(): React.ReactElement {
         }
       })
     }
+    const cleanup = (): void => {
+      document.body.style.userSelect = prevUserSelect
+    }
     const up = (): void => {
       window.removeEventListener("pointermove", move)
       window.removeEventListener("keydown", key)
+      cleanup()
       setDrag((d) => {
         if (d && d.overLaneId !== null && d.overMs !== null) {
           const block = builder().addBlockAt(d.overLaneId, d.overMs, d.presetId, snapMs || 1)
@@ -368,6 +378,7 @@ function ComposePage(): React.ReactElement {
       if (e.key === "Escape") {
         window.removeEventListener("pointermove", move)
         window.removeEventListener("keydown", key)
+        cleanup()
         setDrag(null)
       }
     }

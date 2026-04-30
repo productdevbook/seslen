@@ -66,7 +66,13 @@ export function PresetSidebar({
   }
 
   function pick(entry: PresetEntry): void {
+    // Only update the active id on click; the recent list is touched
+    // when a preset is actually used (drag start), so simply clicking
+    // around the sidebar doesn't reshuffle the list under the cursor.
     onActiveIdChange(entry.id)
+  }
+
+  function markRecent(entry: PresetEntry): void {
     pushRecent(entry.id)
   }
 
@@ -76,9 +82,14 @@ export function PresetSidebar({
   }
 
   function startDrag(entry: PresetEntry, e: React.PointerEvent): void {
+    // Prevent the browser from starting a text selection or focusing
+    // ancestor controls while we wait to see if this becomes a drag.
+    e.preventDefault()
     const startX = e.clientX
     const startY = e.clientY
     let started = false
+    const prevUserSelect = document.body.style.userSelect
+    document.body.style.userSelect = "none"
 
     function onMove(ev: PointerEvent): void {
       if (started) return
@@ -88,11 +99,13 @@ export function PresetSidebar({
         started = true
         onBeginDrag({ presetId: entry.id, pointer: { x: ev.clientX, y: ev.clientY } })
         pick(entry)
+        markRecent(entry)
       }
     }
     function onUp(): void {
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
+      document.body.style.userSelect = prevUserSelect
     }
     window.addEventListener("pointermove", onMove)
     window.addEventListener("pointerup", onUp, { once: true })

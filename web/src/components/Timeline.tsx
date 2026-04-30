@@ -239,6 +239,14 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
     onDropBlock({ laneId: lane.id, ms })
   }
 
+  function lockSelection(): () => void {
+    const prev = document.body.style.userSelect
+    document.body.style.userSelect = "none"
+    return () => {
+      document.body.style.userSelect = prev
+    }
+  }
+
   function startBlockDrag(lane: Lane, b: Block, e: React.PointerEvent): void {
     e.preventDefault()
     e.stopPropagation()
@@ -254,6 +262,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
 
     const cursorMs = (e.clientX - rect.left) / pxPerMs
     const offsetMs = cursorMs - b.position
+    const unlock = lockSelection()
 
     function onMove(ev: PointerEvent): void {
       const distLeft = rect.left - ev.clientX
@@ -272,6 +281,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
     function onUp(): void {
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
+      unlock()
       const pd = builderApi.getState().pendingDelete
       if (pd && pd.laneId === lane.id && pd.blockId === b.id) {
         builderApi.getState().removeBlock(lane.id, b.id)
@@ -288,6 +298,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
     const laneEl = (e.currentTarget as HTMLElement).closest(".lane") as HTMLElement | null
     if (!laneEl) return
     const rect = laneEl.getBoundingClientRect()
+    const unlock = lockSelection()
     function onMove(ev: PointerEvent): void {
       const ms = (ev.clientX - rect.left) / pxPerMs
       if (edge === "right") builderApi.getState().resizeRight(lane.id, b.id, ms, snapMs)
@@ -296,6 +307,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
     function onUp(): void {
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
+      unlock()
       builderApi.getState().commit()
     }
     window.addEventListener("pointermove", onMove)
@@ -312,6 +324,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
     e.stopPropagation()
     const regionEl = e.currentTarget as HTMLElement
     const rect = regionEl.parentElement!.getBoundingClientRect()
+    const unlock = lockSelection()
     function onMove(ev: PointerEvent): void {
       const distFromEdge =
         edge === "top"
@@ -323,6 +336,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
     function onUp(): void {
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
+      unlock()
       builderApi.getState().commit()
     }
     window.addEventListener("pointermove", onMove)
