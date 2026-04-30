@@ -81,14 +81,31 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
   /* ------------------------------------------------------ waveform render */
 
   const renderTokenRef = useRef(0)
+  // Mirror `playing` into a ref so the schedule() callback can read the
+  // latest value without re-running the effect (which would re-tear-down
+  // the ResizeObserver).
+  const playingRef = useRef(playing)
+  playingRef.current = playing
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null
     function schedule(): void {
       if (timer) clearTimeout(timer)
+      // Skip the offline render entirely while playing — the playhead
+      // animation runs at 60fps and a 200-800ms render call inside the
+      // click/play handler caused "[Violation] click handler took ~1s".
+      // The waveform is already on screen from the last render; we'll
+      // refresh it when playback ends.
+      if (playingRef.current) return
       timer = setTimeout(() => {
-        void renderWaveform()
-      }, 80)
+        // Yield to the next idle slot so the click handler that triggered
+        // this re-render can return immediately.
+        if (typeof requestIdleCallback === "function") {
+          requestIdleCallback(() => void renderWaveform(), { timeout: 400 })
+        } else {
+          void renderWaveform()
+        }
+      }, 250)
     }
 
     async function renderWaveform(): Promise<void> {
@@ -109,8 +126,12 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
         return
       }
 
-      const sampleRate = 44100
-      const length = Math.max(1, Math.floor((sampleRate * Math.max(totalMs, 200)) / 1000))
+      // Halve the sample rate (22.05 kHz vs 44.1 kHz) and cap the buffer
+      // length: the preview is a visual waveform, not playback audio, so
+      // we don't need full-fidelity samples.
+      const sampleRate = 22050
+      const cappedMs = Math.min(Math.max(totalMs, 200), 8000)
+      const length = Math.max(1, Math.floor((sampleRate * cappedMs) / 1000))
       type OACtor = new (channels: number, length: number, sampleRate: number) => unknown
       const Offline =
         (window as unknown as { OfflineAudioContext?: OACtor }).OfflineAudioContext ??
@@ -256,7 +277,7 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
       obs.disconnect()
       window.removeEventListener("resize", schedule)
     }
-  }, [steps, totalMs, viewStart, viewEnd])
+  }, [steps, totalMs, viewStart, viewEnd, playing])
 
   return (
     <section className="relative flex-1 flex flex-col bg-foreground text-background p-4 min-h-0 overflow-hidden">
