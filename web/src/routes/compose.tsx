@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { presetEntries, type PresetEntry } from "seslen/presets"
 import type { PlayHandle } from "seslen"
@@ -306,13 +306,22 @@ function ComposePage(): React.ReactElement {
     }
   }
 
-  function onViewChange(payload: { startMs: number; endMs: number }): void {
-    const t = builder().totalMs
-    setView({
-      startMs: Math.max(0, Math.min(t, payload.startMs)),
-      endMs: Math.max(0, Math.min(t, payload.endMs)),
-    })
-  }
+  // Stable identity so Timeline's view-emit useEffect doesn't re-run on
+  // every ComposePage render; without this, Timeline schedules a fresh
+  // RAF emit per render and React 19 flags the resulting setView() as
+  // "update during a different component's render".
+  const onViewChange = useCallback(
+    (payload: { startMs: number; endMs: number }) => {
+      const t = builder().totalMs
+      setView((prev) => {
+        const startMs = Math.max(0, Math.min(t, payload.startMs))
+        const endMs = Math.max(0, Math.min(t, payload.endMs))
+        if (prev.startMs === startMs && prev.endMs === endMs) return prev
+        return { startMs, endMs }
+      })
+    },
+    [builder],
+  )
 
   function snap(ms: number, q: number): number {
     if (q <= 1) return Math.round(ms)

@@ -186,6 +186,25 @@
   tab-size: 2;
 }
 
+/* Comark renders <pre><code> with Shiki inline styles. Match the .code
+ * sizing so the syntax-highlighted Snippet stays compact and readable. */
+.snippet pre,
+.snippet pre code,
+.snippet pre.shiki {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  tab-size: 2;
+  margin: 0;
+  padding: 14px 56px 14px 14px;
+  white-space: pre;
+  overflow-x: auto;
+  background: transparent !important;
+}
+.snippet pre code {
+  padding: 0;
+}
+
 html {
   background: var(--color-paper);
   color: var(--color-ink);
