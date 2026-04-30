@@ -197,8 +197,8 @@ function ComposePage(): React.ReactElement {
       cancelAnimationFrame(elapsedRafRef.current)
       elapsedRafRef.current = 0
     }
-    timelineRef.current?.stopPlayhead()
-    previewRef.current?.stopPlayhead()
+    timelineRef.current?.hidePlayhead()
+    previewRef.current?.hidePlayhead()
     setPlaying(false)
     if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(0)
   }
@@ -222,24 +222,28 @@ function ComposePage(): React.ReactElement {
     if (span <= 0) return
 
     const token = ++playTokenRef.current
-    timelineRef.current?.runPlayhead(span)
-    previewRef.current?.runPlayhead(span)
     setPlaying(true)
-    if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(0)
-
+    // Single RAF drives Timeline's playhead, PreviewPanel's playhead and
+    // the transport bar's elapsed counter — all from the same
+    // performance.now() sample, so nothing can drift relative to anything
+    // else.
     const startedAt = performance.now()
-    function tickElapsed(): void {
+    timelineRef.current?.paintPlayhead(0)
+    previewRef.current?.paintPlayhead(0)
+    if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(0)
+    function tick(): void {
       if (playTokenRef.current !== token) return
       const t = performance.now() - startedAt
       if (t >= span) {
         endPlayback()
         return
       }
-      // Direct DOM write — no React re-render at 60fps.
+      timelineRef.current?.paintPlayhead(t)
+      previewRef.current?.paintPlayhead(t)
       if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(t)
-      elapsedRafRef.current = requestAnimationFrame(tickElapsed)
+      elapsedRafRef.current = requestAnimationFrame(tick)
     }
-    elapsedRafRef.current = requestAnimationFrame(tickElapsed)
+    elapsedRafRef.current = requestAnimationFrame(tick)
 
     void (async () => {
       const handle = await seslenPlayPattern(liveSteps)

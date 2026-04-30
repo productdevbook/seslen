@@ -16,8 +16,10 @@ import { Input } from "@/components/ui/input"
 
 export interface TimelineHandle {
   hitTest: (clientX: number, clientY: number) => { laneId: number; ms: number } | null
-  runPlayhead: (durationMs: number) => void
-  stopPlayhead: () => void
+  /** Move the playhead to `elapsedMs` from the start of the pattern. */
+  paintPlayhead: (elapsedMs: number) => void
+  /** Hide the playhead and reset its position. */
+  hidePlayhead: () => void
   scrollTo: (ms: number) => void
 }
 
@@ -76,8 +78,7 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const playheadRef = useRef<HTMLDivElement | null>(null)
   const playheadVisibleRef = useRef(false)
-  const playheadRafRef = useRef<number>(0)
-  const playheadCleanupRef = useRef<(() => void) | null>(null)
+  const userScrolledRef = useRef(false)
   const followRef = useRef(followPlayhead)
   followRef.current = followPlayhead
 
@@ -129,69 +130,51 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
       if (!root) return
       root.scrollLeft = Math.max(0, ms * pxPerMs - 80)
     },
-    runPlayhead(durationMs) {
-      if (durationMs <= 0) return
-      // cancel any in-flight playhead before starting a new one
-      this.stopPlayhead()
-      playheadVisibleRef.current = true
-      if (playheadRef.current) playheadRef.current.style.display = "block"
-
-      let userScrolled = false
-      function onUserScroll(e: Event): void {
-        if ((e as Event & { isTrusted?: boolean }).isTrusted) userScrolled = true
-      }
+    paintPlayhead(elapsedMs) {
+      const el = playheadRef.current
       const root = scrollRef.current
-      root?.addEventListener("wheel", onUserScroll as EventListener, { passive: true })
-      root?.addEventListener("pointerdown", onUserScroll as EventListener)
-
-      playheadCleanupRef.current = () => {
-        playheadVisibleRef.current = false
-        if (playheadRef.current) {
-          playheadRef.current.style.display = "none"
-          playheadRef.current.style.left = "0px"
-        }
-        root?.removeEventListener("wheel", onUserScroll as EventListener)
-        root?.removeEventListener("pointerdown", onUserScroll as EventListener)
-      }
-
-      const start = performance.now()
-      const tick = (): void => {
-        const elapsed = performance.now() - start
-        if (elapsed >= durationMs) {
-          playheadCleanupRef.current?.()
-          playheadCleanupRef.current = null
-          playheadRafRef.current = 0
-          return
-        }
-        if (playheadRef.current) {
-          playheadRef.current.style.left = `${LABEL_W + elapsed * pxPerMs}px`
-        }
-
-        if (followRef.current && !userScrolled && root) {
-          const visiblePx = Math.max(0, root.clientWidth - LABEL_W)
-          if (visiblePx > 0) {
-            const playheadX = elapsed * pxPerMs
-            const visStart = root.scrollLeft
-            const trigger = visStart + visiblePx * 0.8
-            if (playheadX > trigger || playheadX < visStart) {
-              const target = playheadX - visiblePx * 0.2
-              const newContentW = Math.max(400, Math.round(totalMs * pxPerMs))
-              const maxScroll = Math.max(0, newContentW - visiblePx)
-              root.scrollLeft = Math.max(0, Math.min(maxScroll, target))
+      if (!el) return
+      // First paint of a new run: reveal the head and start watching for
+      // user-driven scrolls so we can pause the auto-follow.
+      if (!playheadVisibleRef.current) {
+        playheadVisibleRef.current = true
+        userScrolledRef.current = false
+        el.style.display = "block"
+        if (root && !root.dataset.tlPlayheadHook) {
+          root.dataset.tlPlayheadHook = "1"
+          const onUserScroll = (e: Event): void => {
+            if ((e as Event & { isTrusted?: boolean }).isTrusted) {
+              userScrolledRef.current = true
             }
           }
+          root.addEventListener("wheel", onUserScroll, { passive: true })
+          root.addEventListener("pointerdown", onUserScroll)
         }
-        playheadRafRef.current = requestAnimationFrame(tick)
       }
-      playheadRafRef.current = requestAnimationFrame(tick)
+      el.style.left = `${LABEL_W + elapsedMs * pxPerMs}px`
+
+      if (followRef.current && !userScrolledRef.current && root) {
+        const visiblePx = Math.max(0, root.clientWidth - LABEL_W)
+        if (visiblePx > 0) {
+          const playheadX = elapsedMs * pxPerMs
+          const visStart = root.scrollLeft
+          const trigger = visStart + visiblePx * 0.8
+          if (playheadX > trigger || playheadX < visStart) {
+            const target = playheadX - visiblePx * 0.2
+            const newContentW = Math.max(400, Math.round(totalMs * pxPerMs))
+            const maxScroll = Math.max(0, newContentW - visiblePx)
+            root.scrollLeft = Math.max(0, Math.min(maxScroll, target))
+          }
+        }
+      }
     },
-    stopPlayhead() {
-      if (playheadRafRef.current) {
-        cancelAnimationFrame(playheadRafRef.current)
-        playheadRafRef.current = 0
+    hidePlayhead() {
+      playheadVisibleRef.current = false
+      userScrolledRef.current = false
+      if (playheadRef.current) {
+        playheadRef.current.style.display = "none"
+        playheadRef.current.style.left = "0px"
       }
-      playheadCleanupRef.current?.()
-      playheadCleanupRef.current = null
     },
   }))
 

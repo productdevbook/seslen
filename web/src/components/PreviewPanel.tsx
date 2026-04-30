@@ -6,8 +6,10 @@ import { PlayCircleIcon } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 
 export interface PreviewPanelHandle {
-  runPlayhead: (durationMs: number) => void
-  stopPlayhead: () => void
+  /** Move the playhead to `elapsedMs` from the start of the pattern. */
+  paintPlayhead: (elapsedMs: number) => void
+  /** Hide the playhead and reset its position. */
+  hidePlayhead: () => void
 }
 
 interface Props {
@@ -35,12 +37,8 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
 ) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const playheadRef = useRef<HTMLDivElement | null>(null)
-  const playheadRafRef = useRef<number>(0)
-  // Latest view-window in refs so the RAF body doesn't depend on
-  // closure-captured state — that was the cause of the jerky playhead:
-  // every state-driven re-render of PreviewPanel re-rendered the whole
-  // tree (waveform canvas included) every frame. Now the RAF only
-  // mutates `style.left` / `style.display` directly.
+  // Latest view-window in refs so the imperative paint method doesn't
+  // depend on closure-captured props.
   const viewRangeRef = useRef<{ start: number; end: number }>({
     start: 0,
     end: Math.max(1, totalMs),
@@ -54,49 +52,25 @@ export const PreviewPanel = forwardRef<PreviewPanelHandle, Props>(function Previ
     return v
   }, [viewEndMs, viewStart, totalMs])
 
-  // Keep the RAF view-range ref in sync with the resolved viewStart/viewEnd
+  // Keep the view-range ref in sync with the resolved viewStart/viewEnd
   // every render. Cheap, no re-render cost.
   viewRangeRef.current = { start: viewStart, end: viewEnd }
 
   const totalLabel = formatTime(totalMs)
   const viewLabel = `${formatTime(viewStart)} → ${formatTime(viewEnd)}`
 
-  function paintPlayhead(elapsed: number): void {
-    const el = playheadRef.current
-    if (!el) return
-    const { start, end } = viewRangeRef.current
-    const span = Math.max(1, end - start)
-    const ratio = Math.max(0, Math.min(1, (elapsed - start) / span))
-    const inView = elapsed >= start && elapsed <= end
-    el.style.display = inView ? "block" : "none"
-    el.style.left = `${ratio * 100}%`
-  }
-
   useImperativeHandle(ref, () => ({
-    runPlayhead(durationMs: number) {
-      if (durationMs <= 0) return
-      if (playheadRafRef.current) cancelAnimationFrame(playheadRafRef.current)
-      const start = performance.now()
-      const tick = (): void => {
-        const elapsed = performance.now() - start
-        if (elapsed >= durationMs) {
-          playheadRafRef.current = 0
-          if (playheadRef.current) {
-            playheadRef.current.style.display = "none"
-            playheadRef.current.style.left = "0%"
-          }
-          return
-        }
-        paintPlayhead(elapsed)
-        playheadRafRef.current = requestAnimationFrame(tick)
-      }
-      playheadRafRef.current = requestAnimationFrame(tick)
+    paintPlayhead(elapsedMs: number) {
+      const el = playheadRef.current
+      if (!el) return
+      const { start, end } = viewRangeRef.current
+      const span = Math.max(1, end - start)
+      const ratio = Math.max(0, Math.min(1, (elapsedMs - start) / span))
+      const inView = elapsedMs >= start && elapsedMs <= end
+      el.style.display = inView ? "block" : "none"
+      el.style.left = `${ratio * 100}%`
     },
-    stopPlayhead() {
-      if (playheadRafRef.current) {
-        cancelAnimationFrame(playheadRafRef.current)
-        playheadRafRef.current = 0
-      }
+    hidePlayhead() {
       if (playheadRef.current) {
         playheadRef.current.style.display = "none"
         playheadRef.current.style.left = "0%"
