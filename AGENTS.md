@@ -26,7 +26,7 @@ src/
   _persist.ts       # localStorage volume + mute persistence
   _render.ts        # OfflineAudioContext render-to-WAV
   _analyser.ts      # AnalyserNode tap on master (waveform / spectrum)
-  presets/          # One file per built-in preset (36 total)
+  presets/          # One file per built-in preset
     _meta.ts        # PresetEntry type + asHandle/callGain/noiseBurst helpers
     _template.ts    # Copy-paste starter for new presets
     CONTRIBUTING.md # 30-line guide for adding presets
@@ -135,6 +135,6 @@ pnpm release        # pnpm test && build && bundle-budget && bumpp --commit --ta
 - ⬜ v0.1.0 — `createSeslen` + synthesised presets + Vite/Tailwind playground
 - ⬜ v0.2.0 — full Web Audio surface: buses, voices, ducking, throttle, jitter,
   fades, pan, sprites, scheduling (`when`), reduced-motion, persistence,
-  OfflineAudioContext render-to-WAV, AnalyserNode tap, latency reporting; 36
+  OfflineAudioContext render-to-WAV, AnalyserNode tap, latency reporting;
   built-in presets across UI / game / ambient categories.
 - ⬜ v0.3.0 — framework adapters (react, vue, svelte) + theme/preset packs.

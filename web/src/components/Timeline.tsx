@@ -81,6 +81,13 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
   const userScrolledRef = useRef(false)
   const followRef = useRef(followPlayhead)
   followRef.current = followPlayhead
+  // Cache scroll metrics so paintPlayhead() doesn't read clientWidth /
+  // scrollLeft every frame — those are forced-layout reads and were
+  // pushing the RAF handler over the 16 ms budget.
+  const scrollMetricsRef = useRef<{ clientWidth: number; scrollLeft: number }>({
+    clientWidth: 0,
+    scrollLeft: 0,
+  })
 
   const contentW = Math.max(400, Math.round(totalMs * pxPerMs))
 
@@ -154,16 +161,21 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
       el.style.left = `${LABEL_W + elapsedMs * pxPerMs}px`
 
       if (followRef.current && !userScrolledRef.current && root) {
-        const visiblePx = Math.max(0, root.clientWidth - LABEL_W)
+        // Use cached metrics. The scroll listener / ResizeObserver below
+        // keep them in sync; reading them here would force a layout
+        // every frame.
+        const { clientWidth, scrollLeft } = scrollMetricsRef.current
+        const visiblePx = Math.max(0, clientWidth - LABEL_W)
         if (visiblePx > 0) {
           const playheadX = elapsedMs * pxPerMs
-          const visStart = root.scrollLeft
-          const trigger = visStart + visiblePx * 0.8
-          if (playheadX > trigger || playheadX < visStart) {
+          const trigger = scrollLeft + visiblePx * 0.8
+          if (playheadX > trigger || playheadX < scrollLeft) {
             const target = playheadX - visiblePx * 0.2
             const newContentW = Math.max(400, Math.round(totalMs * pxPerMs))
             const maxScroll = Math.max(0, newContentW - visiblePx)
-            root.scrollLeft = Math.max(0, Math.min(maxScroll, target))
+            const next = Math.max(0, Math.min(maxScroll, target))
+            root.scrollLeft = next
+            scrollMetricsRef.current.scrollLeft = next
           }
         }
       }
@@ -188,8 +200,13 @@ export const Timeline = forwardRef<TimelineHandle, Props>(function Timeline(
         raf = 0
         const root = scrollRef.current
         if (!root) return
-        const visiblePx = Math.max(0, root.clientWidth - LABEL_W)
-        const startMs = root.scrollLeft / pxPerMs
+        const clientWidth = root.clientWidth
+        const scrollLeft = root.scrollLeft
+        // Batch the layout reads here once per scroll/resize so the
+        // playhead RAF can use cached values.
+        scrollMetricsRef.current = { clientWidth, scrollLeft }
+        const visiblePx = Math.max(0, clientWidth - LABEL_W)
+        const startMs = scrollLeft / pxPerMs
         const endMs = startMs + visiblePx / pxPerMs
         onViewChange({
           startMs: Math.max(0, startMs),

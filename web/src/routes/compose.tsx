@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowLeft01Icon,
   ArrowDown01Icon,
+  Github01Icon,
   UndoIcon,
   RedoIcon,
   PauseIcon,
@@ -226,8 +227,12 @@ function ComposePage(): React.ReactElement {
     // Single RAF drives Timeline's playhead, PreviewPanel's playhead and
     // the transport bar's elapsed counter — all from the same
     // performance.now() sample, so nothing can drift relative to anything
-    // else.
+    // else. Playheads paint every frame; the elapsed counter only
+    // refreshes at ~10 fps because no human reads sub-100ms changes and
+    // String allocation + DOM textContent writes were a measurable slice
+    // of the per-frame budget.
     const startedAt = performance.now()
+    let lastLabelMs = -1
     timelineRef.current?.paintPlayhead(0)
     previewRef.current?.paintPlayhead(0)
     if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(0)
@@ -240,7 +245,10 @@ function ComposePage(): React.ReactElement {
       }
       timelineRef.current?.paintPlayhead(t)
       previewRef.current?.paintPlayhead(t)
-      if (elapsedLabelRef.current) elapsedLabelRef.current.textContent = formatTime(t)
+      if (elapsedLabelRef.current && t - lastLabelMs >= 100) {
+        elapsedLabelRef.current.textContent = formatTime(t)
+        lastLabelMs = t
+      }
       elapsedRafRef.current = requestAnimationFrame(tick)
     }
     elapsedRafRef.current = requestAnimationFrame(tick)
@@ -558,6 +566,23 @@ function ComposePage(): React.ReactElement {
         </span>
 
         <div className="ml-auto flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <a
+                  href="https://github.com/productdevbook/seslen"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-8 items-center justify-center rounded-md border border-input bg-background px-2.5 gap-1.5 text-[12px] font-medium hover:bg-muted transition"
+                >
+                  <HugeiconsIcon icon={Github01Icon} strokeWidth={2} className="size-4" />
+                  <span className="hidden md:inline">GitHub</span>
+                </a>
+              }
+            />
+            <TooltipContent>Open repo · contribute a preset</TooltipContent>
+          </Tooltip>
+
           <Popover open={demosOpen} onOpenChange={setDemosOpen}>
             <PopoverTrigger
               render={

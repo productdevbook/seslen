@@ -7,9 +7,12 @@ import {
   ArrowRight01Icon,
   ArrowUp01Icon,
   Copy01Icon,
+  FavouriteIcon,
+  Github01Icon,
   RepeatIcon,
   PlayCircleIcon,
   Search01Icon,
+  StarIcon,
   UnfoldMoreIcon,
 } from "@hugeicons/core-free-icons"
 import { Badge } from "@/components/ui/badge"
@@ -240,6 +243,26 @@ function IndexPage(): React.ReactElement {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10 flex flex-col gap-6">
+      <a
+        href="https://github.com/productdevbook/seslen"
+        target="_blank"
+        rel="noreferrer"
+        className="group flex items-center gap-3 rounded-lg border border-border bg-muted/40 hover:bg-muted px-4 py-2.5 text-[12px] transition"
+      >
+        <HugeiconsIcon icon={Github01Icon} strokeWidth={2} className="size-4 shrink-0" />
+        <span className="flex-1 leading-snug">
+          <strong className="font-semibold">Got a sound in your head?</strong>{" "}
+          <span className="text-muted-foreground">
+            Contribute a preset on GitHub — it's a single self-contained file under{" "}
+            <code className="font-mono text-[11px]">src/presets/</code>.
+          </span>
+        </span>
+        <span className="hidden sm:inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition">
+          Open repo
+          <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} className="size-3.5" />
+        </span>
+      </a>
+
       <header className="flex items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
           <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -317,8 +340,63 @@ function IndexPage(): React.ReactElement {
         emptyState={`No presets match "${query}".`}
       />
 
-      <footer className="pt-4 pb-2 text-center text-[11px] font-mono text-muted-foreground">
-        github.com/productdevbook/seslen — contribute presets in src/presets/
+      <footer className="pt-6 pb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-muted-foreground border-t mt-2">
+        <span>
+          MIT ©{" "}
+          <a
+            href="https://github.com/productdevbook"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-foreground transition"
+          >
+            productdevbook
+          </a>
+        </span>
+        <nav className="flex items-center gap-3 flex-wrap justify-center">
+          <a
+            href="https://github.com/productdevbook/seslen"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-foreground transition"
+          >
+            <HugeiconsIcon icon={Github01Icon} strokeWidth={2} className="size-3.5" />
+            Repository
+          </a>
+          <a
+            href="https://github.com/productdevbook/seslen/tree/main/src/presets"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-foreground transition"
+          >
+            <HugeiconsIcon icon={StarIcon} strokeWidth={2} className="size-3.5" />
+            Contribute a preset
+          </a>
+          <a
+            href="https://www.npmjs.com/package/seslen"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-foreground transition"
+          >
+            npm
+          </a>
+          <a
+            href="https://github.com/productdevbook/seslen/issues"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-foreground transition"
+          >
+            Issues
+          </a>
+          <a
+            href="https://github.com/sponsors/productdevbook"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-foreground transition"
+          >
+            <HugeiconsIcon icon={FavouriteIcon} strokeWidth={2} className="size-3.5" />
+            Sponsor
+          </a>
+        </nav>
       </footer>
     </main>
   )

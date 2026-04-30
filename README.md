@@ -12,10 +12,15 @@
   <a href="https://www.npmjs.com/package/seslen"><img src="https://img.shields.io/npm/v/seslen?color=42b883" alt="npm"></a>
   <a href="https://bundlephobia.com/package/seslen"><img src="https://img.shields.io/bundlephobia/minzip/seslen?color=7073e8" alt="bundle size"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/npm/l/seslen?color=ff8a65" alt="license"></a>
+  <a href="https://seslen.productdevbook.com"><img src="https://img.shields.io/badge/playground-seslen.productdevbook.com-2563eb" alt="playground"></a>
 </p>
 
-> [!WARNING]
-> `seslen` is under active development. The API may break between 0.x releases.
+<p align="center">
+  <strong>🎧 Live playground:</strong> <a href="https://seslen.productdevbook.com">seslen.productdevbook.com</a> — preview every preset, build patterns in the composer, and copy the exact code.
+</p>
+
+> [!IMPORTANT]
+> **Got a sound in your head? Send it our way.** `seslen` is community-built — every preset starts as a one-file PR. The biggest contribution you can make right now is a new preset: open [`src/presets/`](./src/presets/), copy [`_template.ts`](./src/presets/_template.ts), and ship it. We'll help land it.
 
 ## Why seslen?
 
@@ -37,7 +42,7 @@ handle?.stop()
 ## Features
 
 - 🪶 **Zero dependencies**, pure ESM, tree-shakeable
-- 🎹 **36 synthesised presets** — every play generated fresh on `AudioContext`
+- 🎹 **Synthesised UI presets** — every play generated fresh on `AudioContext`
 - ⚡ **Lazy AudioContext** — created only on the first `play()`
 - 🔓 **Auto-unlock** — resumes the context on the first user gesture
 - ♿️ **Respects `prefers-reduced-motion`** — auto-mutes by default
