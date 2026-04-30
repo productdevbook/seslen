@@ -1,6 +1,6 @@
 {
   "name": "seslen",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "High-DX Web Audio: zero-dep, tree-shakeable library with synthesised UI sound presets, named buses + ducking, polyphony cap, throttle, jitter, fades, pan, sprites, sample-accurate scheduling, OfflineAudioContext render-to-WAV, AnalyserNode tap, prefers-reduced-motion auto-mute, localStorage persistence and an SSR-safe stub. Strict TypeScript.",
   "keywords": [
     "analyser",
