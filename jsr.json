@@ -1,0 +1,13 @@
+{
+  "name": "@productdevbook/seslen",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/index.ts",
+    "./presets": "./src/presets/index.ts",
+    "./server": "./src/server.ts"
+  },
+  "publish": {
+    "include": ["src/**/*.ts", "README.md", "LICENSE"],
+    "exclude": ["src/**/*.test.ts", "src/env.d.ts"]
+  }
+}

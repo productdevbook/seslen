@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" width="1200" height="628">
+  <defs>
+    <filter id="paper">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.82  0 0 0 0 0.74  0 0 0 0 0.62  0 0 0 0.08 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feComposite in2="off" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <linearGradient id="wordmarkGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b3a2f"/>
+      <stop offset="100%" stop-color="#2d5a48"/>
+    </linearGradient>
+
+    <linearGradient id="coral" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff8a65"/>
+      <stop offset="100%" stop-color="#ff5a36"/>
+    </linearGradient>
+
+    <linearGradient id="mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#83e0bd"/>
+      <stop offset="100%" stop-color="#42b883"/>
+    </linearGradient>
+
+    <linearGradient id="periwinkle" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a5a8ff"/>
+      <stop offset="100%" stop-color="#7073e8"/>
+    </linearGradient>
+
+    <linearGradient id="butter" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffe38a"/>
+      <stop offset="100%" stop-color="#ffb84d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Paper background -->
+  <rect width="1200" height="628" fill="#fbf6ed"/>
+  <rect width="1200" height="628" filter="url(#paper)"/>
+
+  <!-- Subtle diagonal stripes, very faint -->
+  <g opacity="0.05" fill="#1b3a2f">
+    <rect x="-100" y="-100" width="2" height="900" transform="rotate(20 600 314)"/>
+    <rect x="-40" y="-100" width="2" height="900" transform="rotate(20 600 314)"/>
+    <rect x="20" y="-100" width="2" height="900" transform="rotate(20 600 314)"/>
+    <rect x="80" y="-100" width="2" height="900" transform="rotate(20 600 314)"/>
+    <rect x="140" y="-100" width="2" height="900" transform="rotate(20 600 314)"/>
+  </g>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- LEFT COLUMN: speaker + ripples       -->
+  <!-- ════════════════════════════════════ -->
+
+  <!-- Big speaker / cone, top-left -->
+  <g transform="translate(70, 150) rotate(-4)" filter="url(#softShadow)">
+    <!-- Speaker body -->
+    <rect x="0" y="0" width="120" height="170" rx="20" fill="url(#coral)"/>
+    <!-- Tweeter -->
+    <circle cx="60" cy="48" r="20" fill="#fbf6ed" opacity="0.95"/>
+    <circle cx="60" cy="48" r="10" fill="#1b3a2f" opacity="0.35"/>
+    <!-- Woofer -->
+    <circle cx="60" cy="118" r="36" fill="#fbf6ed" opacity="0.95"/>
+    <circle cx="60" cy="118" r="22" fill="#1b3a2f" opacity="0.18"/>
+    <circle cx="60" cy="118" r="10" fill="#1b3a2f" opacity="0.35"/>
+    <!-- Sound waves spilling out -->
+    <path d="M148,90 Q174,118 148,146" fill="none" stroke="url(#coral)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M170,72 Q210,118 170,164" fill="none" stroke="url(#coral)" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+    <path d="M192,54 Q246,118 192,182" fill="none" stroke="url(#coral)" stroke-width="5" stroke-linecap="round" opacity="0.45"/>
+  </g>
+
+  <!-- Equaliser bars, bottom-left -->
+  <g transform="translate(80, 410)" filter="url(#softShadow)">
+    <rect x="0"   y="40" width="22" height="60"  rx="11" fill="url(#mint)"/>
+    <rect x="36"  y="10" width="22" height="120" rx="11" fill="url(#mint)"/>
+    <rect x="72"  y="34" width="22" height="80"  rx="11" fill="url(#mint)"/>
+    <rect x="108" y="0"  width="22" height="140" rx="11" fill="url(#mint)"/>
+    <rect x="144" y="48" width="22" height="48"  rx="11" fill="url(#mint)"/>
+    <rect x="180" y="22" width="22" height="100" rx="11" fill="url(#mint)"/>
+    <rect x="216" y="56" width="22" height="32"  rx="11" fill="url(#mint)"/>
+  </g>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- RIGHT COLUMN: notes + waveform       -->
+  <!-- ════════════════════════════════════ -->
+
+  <!-- Glowing halo + headphone, top-right -->
+  <g transform="translate(960, 110)">
+    <circle cx="100" cy="100" r="108" fill="#7073e8" opacity="0.18"/>
+    <circle cx="100" cy="100" r="82"  fill="#7073e8" opacity="0.3"/>
+    <g transform="translate(8, 24)" filter="url(#softShadow)">
+      <!-- Headphone band -->
+      <path d="M10,96 Q10,10 106,10 Q202,10 202,96" fill="none" stroke="url(#periwinkle)" stroke-width="12" stroke-linecap="round"/>
+      <!-- Cups -->
+      <rect x="-6" y="86"  width="46" height="74" rx="14" fill="url(#periwinkle)"/>
+      <rect x="6"  y="100" width="22" height="46" rx="6"  fill="#1b3a2f" opacity="0.25"/>
+      <rect x="172" y="86" width="46" height="74" rx="14" fill="url(#periwinkle)"/>
+      <rect x="184" y="100" width="22" height="46" rx="6" fill="#1b3a2f" opacity="0.25"/>
+    </g>
+  </g>
+
+  <!-- Music note + sparkles, bottom-right -->
+  <g transform="translate(990, 420) rotate(-6)" filter="url(#softShadow)">
+    <!-- Note stem -->
+    <rect x="80" y="0" width="10" height="120" rx="5" fill="url(#butter)"/>
+    <!-- Note flag -->
+    <path d="M88,0 Q150,12 138,68 Q124,40 88,46 Z" fill="url(#butter)"/>
+    <!-- Note head -->
+    <ellipse cx="60" cy="118" rx="28" ry="20" fill="url(#butter)" transform="rotate(-18 60 118)"/>
+    <!-- Sparkles -->
+    <circle cx="160" cy="14" r="6" fill="url(#coral)"/>
+    <circle cx="180" cy="58" r="4" fill="url(#mint)"/>
+    <circle cx="6"   cy="82" r="5" fill="url(#periwinkle)"/>
+  </g>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- CENTER CONTENT — BIG & LEGIBLE        -->
+  <!-- ════════════════════════════════════ -->
+
+  <!-- Wordmark -->
+  <text x="600" y="270" text-anchor="middle"
+        fill="url(#wordmarkGrad)"
+        font-family="'Cooper','Cooper Black','Georgia',serif"
+        font-size="200" font-weight="900" letter-spacing="-6">seslen</text>
+
+  <!-- Coral underline shaped like a tiny waveform -->
+  <path d="M400,302 Q450,288 500,302 T600,302 T700,302 T800,302" stroke="url(#coral)" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+  <!-- Tagline -->
+  <text x="600" y="362" text-anchor="middle"
+        fill="#1b3a2f"
+        font-family="'Inter','Helvetica Neue',Arial,sans-serif"
+        font-size="30" font-weight="700" letter-spacing="-0.3">High-DX Web Audio. Built-in UI sounds, one line away.</text>
+
+  <!-- Feature chips -->
+  <g font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="18" font-weight="700"
+     text-anchor="middle">
+    <g transform="translate(252, 402)">
+      <rect x="0" y="0" width="176" height="48" rx="24" fill="url(#coral)"/>
+      <text x="88" y="31" fill="#fff">0 dependencies</text>
+    </g>
+    <g transform="translate(442, 402)">
+      <rect x="0" y="0" width="160" height="48" rx="24" fill="url(#mint)"/>
+      <text x="80" y="31" fill="#143a2b">AudioContext</text>
+    </g>
+    <g transform="translate(616, 402)">
+      <rect x="0" y="0" width="148" height="48" rx="24" fill="url(#periwinkle)"/>
+      <text x="74" y="31" fill="#fff">TypeScript</text>
+    </g>
+    <g transform="translate(778, 402)">
+      <rect x="0" y="0" width="178" height="48" rx="24" fill="url(#butter)"/>
+      <text x="89" y="31" fill="#5a3a00">tree-shakeable</text>
+    </g>
+  </g>
+
+  <!-- npm install pill -->
+  <g transform="translate(450, 488)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="300" height="56" rx="28" fill="#1b3a2f"/>
+    <text x="150" y="35" text-anchor="middle" xml:space="preserve"
+          font-family="'JetBrains Mono','SF Mono',monospace" font-size="20" font-weight="700">
+      <tspan fill="#ff8a65" font-weight="800">$</tspan><tspan fill="#fbf6ed">&#160;npm&#160;i&#160;</tspan><tspan fill="#83e0bd" font-weight="800">seslen</tspan>
+    </text>
+  </g>
+
+  <!-- GitHub link -->
+  <text x="600" y="590" text-anchor="middle"
+        fill="#1b3a2f" opacity="0.55"
+        font-family="'Inter','Helvetica Neue',Arial,sans-serif"
+        font-size="16" font-weight="600" letter-spacing="0.3">github.com/productdevbook/seslen</text>
+</svg>
