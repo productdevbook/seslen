@@ -48,48 +48,87 @@ import type { PresetEntry } from "./_meta.ts"
 
 export type { PresetEntry } from "./_meta.ts"
 
-const _presetEntries = {
-  // Original eight
-  tick,
-  success,
-  error,
-  warning,
-  message,
-  add,
+/**
+ * Built-in preset registry. Spelled out long-form (`tick: tick`) instead of
+ * shorthand because `--isolatedDeclarations` (used by obuild's DTS pass)
+ * can't infer the type of shorthand properties — every key needs an
+ * explicit value expression for the declaration emitter.
+ */
+const _presetEntries: {
+  tick: PresetEntry
+  success: PresetEntry
+  error: PresetEntry
+  warning: PresetEntry
+  message: PresetEntry
+  add: PresetEntry
+  delete: PresetEntry
+  victory: PresetEntry
+  hover: PresetEntry
+  pop: PresetEntry
+  swoosh: PresetEntry
+  "toggle-on": PresetEntry
+  "toggle-off": PresetEntry
+  notify: PresetEntry
+  keypress: PresetEntry
+  "scroll-tick": PresetEntry
+  drag: PresetEntry
+  drop: PresetEntry
+  expand: PresetEntry
+  collapse: PresetEntry
+  undo: PresetEntry
+  redo: PresetEntry
+  send: PresetEntry
+  receive: PresetEntry
+  copy: PresetEntry
+  paste: PresetEntry
+  "level-up": PresetEntry
+  coin: PresetEntry
+  jump: PresetEntry
+  shoot: PresetEntry
+  explosion: PresetEntry
+  heartbeat: PresetEntry
+  alarm: PresetEntry
+  typewriter: PresetEntry
+  lock: PresetEntry
+  unlock: PresetEntry
+} = {
+  tick: tick,
+  success: success,
+  error: error,
+  warning: warning,
+  message: message,
+  add: add,
   delete: deletePreset,
-  victory,
-  // UI feedback
-  hover,
-  pop,
-  swoosh,
+  victory: victory,
+  hover: hover,
+  pop: pop,
+  swoosh: swoosh,
   "toggle-on": toggleOn,
   "toggle-off": toggleOff,
-  notify,
-  keypress,
+  notify: notify,
+  keypress: keypress,
   "scroll-tick": scrollTick,
-  drag,
-  drop,
-  expand,
-  collapse,
-  undo,
-  redo,
-  send,
-  receive,
-  copy,
-  paste,
-  // Game / playful
+  drag: drag,
+  drop: drop,
+  expand: expand,
+  collapse: collapse,
+  undo: undo,
+  redo: redo,
+  send: send,
+  receive: receive,
+  copy: copy,
+  paste: paste,
   "level-up": levelUp,
-  coin,
-  jump,
-  shoot,
-  explosion,
-  // Ambient / state
-  heartbeat,
-  alarm,
-  typewriter,
-  lock,
-  unlock,
-} as const satisfies Record<string, PresetEntry>
+  coin: coin,
+  jump: jump,
+  shoot: shoot,
+  explosion: explosion,
+  heartbeat: heartbeat,
+  alarm: alarm,
+  typewriter: typewriter,
+  lock: lock,
+  unlock: unlock,
+}
 
 /** Union of every built-in preset ID. */
 export type PresetName = keyof typeof _presetEntries

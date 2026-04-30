@@ -573,10 +573,6 @@ function ComposePage(): React.ReactElement {
             </PopoverContent>
           </Popover>
 
-          <Button variant="outline" size="sm" onClick={addEmptyLane}>
-            <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
-            Track
-          </Button>
           <Button variant="outline" size="sm" disabled={lanes.length === 0} onClick={clearAll}>
             Clear
           </Button>
@@ -740,6 +736,11 @@ function ComposePage(): React.ReactElement {
           </div>
 
           <Separator orientation="vertical" className="h-6" />
+
+          <Button variant="outline" size="sm" onClick={addEmptyLane}>
+            <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
+            Track
+          </Button>
 
           <Button
             variant={followPlayhead ? "default" : "outline"}
